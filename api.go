@@ -1,4 +1,4 @@
-package api
+package gotendex
 
 import (
 	"encoding/json"
