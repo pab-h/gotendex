@@ -3,7 +3,6 @@ package gotendex
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 
@@ -33,15 +32,11 @@ func (api Api) Book(id int) resources.Book {
 
 	defer response.Body.Close()
 
-	body, error := io.ReadAll(response.Body)
-
-	if error != nil {
-		log.Fatal(error)
-	}
-
 	book := resources.Book{}
 
-	if error := json.Unmarshal(body, &book); error != nil {
+	decoder := json.NewDecoder(response.Body)
+
+	if error := decoder.Decode(&book); error != nil {
 		log.Fatal(error)
 	}
 

@@ -1,8 +1,8 @@
 package resources
 
 type Response struct {
-	Count    int
-	Results []Book
-	Previous string
-	Next     string
+	Count    int    `json:"count"`
+	Results  []Book `json:"results"`
+	Previous string `json:"previous"`
+	Next     string `json:"next"`
 }
