@@ -2,6 +2,7 @@ package gotendex
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -22,7 +23,7 @@ func NewApi() Api {
 }
 
 func (api Api) Book(id int) resources.Book {
-	url := api.baseUrl + string(rune(id))
+	url := fmt.Sprintf("%v%v", api.baseUrl, id)
 
 	response, error := http.Get(url)
 
