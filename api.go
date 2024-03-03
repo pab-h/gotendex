@@ -64,7 +64,7 @@ func (api Api) Books() resources.Response {
 }
 
 func (api Api) QueryBooks(query Query) resources.Response {
-	url := fmt.Sprintf("%v%v", api.baseUrl, query.ToURI())
+	url := fmt.Sprintf("%v?%v", api.baseUrl, query.ToURI())
 
 	response, error := http.Get(url)
 
