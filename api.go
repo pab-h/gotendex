@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/pab-h/gotendex/resources"
+	src "github.com/pab-h/gotendex/resources"
 )
 
 const APIURL string = "http://gutendex.com/books/"
@@ -21,7 +21,7 @@ func NewApi() Api {
 	}
 }
 
-func (api Api) Book(id int) resources.Book {
+func (api Api) Book(id int) *src.Book {
 	url := fmt.Sprintf("%v%v", api.baseUrl, id)
 
 	response, error := http.Get(url)
@@ -32,7 +32,7 @@ func (api Api) Book(id int) resources.Book {
 
 	defer response.Body.Close()
 
-	book := resources.Book{}
+	book := src.Book{}
 
 	decoder := json.NewDecoder(response.Body)
 
@@ -40,10 +40,10 @@ func (api Api) Book(id int) resources.Book {
 		log.Fatal(error)
 	}
 
-	return book
+	return &book
 }
 
-func (api Api) Books() resources.Response {
+func (api Api) Books() *src.Response {
 	response, error := http.Get(api.baseUrl)
 
 	if error != nil {
@@ -52,7 +52,7 @@ func (api Api) Books() resources.Response {
 
 	defer response.Body.Close()
 
-	apiResponse := resources.Response{}
+	apiResponse := src.Response{}
 
 	decoder := json.NewDecoder(response.Body)
 
@@ -60,10 +60,10 @@ func (api Api) Books() resources.Response {
 		log.Fatal(error)
 	}
 
-	return apiResponse
+	return &apiResponse
 }
 
-func (api Api) QueryBooks(query Query) resources.Response {
+func (api Api) QueryBooks(query *Query) *src.Response {
 	url := fmt.Sprintf("%v?%v", api.baseUrl, query.ToURI())
 
 	response, error := http.Get(url)
@@ -74,7 +74,7 @@ func (api Api) QueryBooks(query Query) resources.Response {
 
 	defer response.Body.Close()
 
-	apiResponse := resources.Response{}
+	apiResponse := src.Response{}
 
 	decoder := json.NewDecoder(response.Body)
 
@@ -82,13 +82,53 @@ func (api Api) QueryBooks(query Query) resources.Response {
 		log.Fatal(error)
 	}
 
-	return apiResponse
+	return &apiResponse
 }
 
-func (api Api) Next(response resources.Response) resources.Response {
-	return resources.Response{}
+func (api Api) Next(response *src.Response) (*src.Response, bool) {
+	if len(response.Next) == 0 {
+		return &src.Response{}, false
+	}
+
+	nextResponse, error := http.Get(response.Next)
+
+	if error != nil {
+		log.Fatal(error)
+	}
+
+	defer nextResponse.Body.Close()
+
+	apiResponse := src.Response{}
+
+	decoder := json.NewDecoder(nextResponse.Body)
+
+	if error := decoder.Decode(&apiResponse); error != nil {
+		log.Fatal(error)
+	}
+
+	return &apiResponse, true
 }
 
-func (api Api) Previous(response resources.Response) resources.Response {
-	return resources.Response{}
+func (api Api) Previous(response *src.Response) (*src.Response, bool){
+	if len(response.Previous) == 0 {
+		return &src.Response{}, false
+	}
+
+	previousResponse, error := http.Get(response.Previous)
+
+	if error != nil {
+		log.Fatal(error)
+	}
+
+	defer previousResponse.Body.Close()
+
+	apiResponse := src.Response{}
+
+	decoder := json.NewDecoder(previousResponse.Body)
+
+	if error := decoder.Decode(&apiResponse); error != nil {
+		log.Fatal(error)
+	}
+
+	return &apiResponse, true
 }
