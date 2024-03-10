@@ -2,6 +2,7 @@ package gotendex
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -21,13 +22,13 @@ func NewApi() Api {
 	}
 }
 
-func (api Api) Book(id int) *src.Book {
+func (api Api) Book(id int) (*src.Book, error) {
 	url := fmt.Sprintf("%v%v", api.baseUrl, id)
 
 	response, error := http.Get(url)
 
 	if error != nil {
-		log.Fatal(error)
+		return &src.Book{}, error
 	}
 
 	defer response.Body.Close()
@@ -36,11 +37,15 @@ func (api Api) Book(id int) *src.Book {
 
 	decoder := json.NewDecoder(response.Body)
 
-	if error := decoder.Decode(&book); error != nil {
-		log.Fatal(error)
+	if response.StatusCode == http.StatusNotFound {
+		return &src.Book{}, errors.New("not found")
 	}
 
-	return &book
+	if error := decoder.Decode(&book); error != nil {
+		return &src.Book{}, error
+	}
+
+	return &book, nil
 }
 
 func (api Api) Books() *src.Response {
