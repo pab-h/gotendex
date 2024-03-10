@@ -1,6 +1,6 @@
 # Gotendex
 
-Wrapper for JSON web API for Project Gutenberg ebook metadata
+Wrapper for JSON web API for Project Gutenberg ebook metadata, [see here](http://gutendex.com/)
 
 # How install
 
